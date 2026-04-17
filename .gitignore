@@ -1,0 +1,10 @@
+*.exe
+*.o
+*.obj
+*.bc
+
+.vscode
+.zed
+
+# Pasta com o mars
+dep 
