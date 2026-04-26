@@ -49,5 +49,4 @@ diff:
         jr     $ra
 igual:
         li     $v0, 0
-        jr     $ra
-
+        jr $ra          # Retorna o ponteiro da função
