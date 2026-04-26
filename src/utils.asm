@@ -9,5 +9,3 @@ print:
         li      $v0, 4  # syscall para imprimir a string
         syscall         # Chama o syscall
         jr $ra          # Retorna o ponteiro da função
-
-
