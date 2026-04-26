@@ -7,12 +7,9 @@
 # Retorno:
 #	$v0 - (o endereço do destino (destination)
 # =========================================================================
-.data
-	origem:  .asciiz "Hello World"
-	destino: .byte 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', '\0' 
-
 .text
 .globl strcpy
+
 	main:
 	la $a0, destino	#a0 é o inicio do array do destination (destino)
 	la $a1, origem	#a1 é o inicio do array de source (origem)
