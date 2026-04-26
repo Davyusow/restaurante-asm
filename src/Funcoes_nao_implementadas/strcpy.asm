@@ -9,12 +9,8 @@
 # =========================================================================
 .text
 .globl strcpy
-
-	main:
-	la $a0, destino	#a0 é o inicio do array do destination (destino)
-	la $a1, origem	#a1 é o inicio do array de source (origem)
 	
-	strcopy: #Para utilizar essa função obrigatóriamente deve ser passado como parâmetro nos registradores a0 e a1 o ENDEREÇO, por meio da função "la" (LOAD ADDRESS)
+	strcpy: #Para utilizar essa função obrigatóriamente deve ser passado como parâmetro nos registradores a0 e a1 o ENDEREÇO, por meio da função "la" (LOAD ADDRESS)
 		addu $t0, $zero, $a0 #Armazenando o inicio do array destino em t0
 		addu $t1, $zero, $a1 #Armazenando o inicio do array origem em t1
 	
@@ -28,6 +24,6 @@
 			addi $t1, $t1, 1 #Andando uma letra (indice) do array destino (4 bytes)
 			j while #Volta para o inicio do loop
 		fim:
-		addu $v0, $zero, $t0 #Armazenando o endereço de memória do destino (parâmetro destination) no registrador de retorno da função
+		addu $v0, $zero, $a0 #Armazenando o endereço de memória do destino (parâmetro destination) no registrador de retorno da função
 		jr $ra #Volta para o lugar onde a função foi chamada
 	
