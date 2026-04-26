@@ -45,7 +45,7 @@
 	
 		while:	#t1 != 0, iterando atï¿½ o fim da string que termina com \0, a verificaï¿½ï¿½o ocorrerï¿½ no beq 		
 		
-			lb $t2, ($t1) #Pego apenas uma letra (no caso 1 char tem 8 bytes) e passo para t2 	
+			lb $t2, ($t1) #Pego apenas uma letra (no caso 1 char tem 1 byte) e passo para t2 	
 			sb $t2, ($t0) #Armazeno o valor do indice (letra) atual no endereï¿½o de t0 (indice do array destino) 
 			beq $t2, $zero, fim  #loop quando chegar no fim da string (\0)
 
@@ -53,6 +53,6 @@
 			addi $t1, $t1, 1 #Andando uma letra (indice) do array destino (4 bytes)
 			j while
 		fim:
-		addu $v0, $zero, $t0 #Armazenando o endereço de memória do destino (parâmetro destination) no registrador de retorno da função
+		addu $v0, $zero, $a0 #Armazenando o endereço de memória do destino (parâmetro destination) no registrador de retorno da função
 		jr $ra #Volta para o lugar onde a função foi chamada
 	
