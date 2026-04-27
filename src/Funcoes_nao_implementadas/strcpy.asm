@@ -16,7 +16,7 @@
 	
 		while:	#t1 != 0, iterando até o fim da string que termina com \0, a verificação ocorrerá no beq 		
 		
-			lb $t2, ($t1) #Pego apenas uma letra (no caso 1 char tem 8 bytes) e passo para t2 	
+			lb $t2, ($t1) #Pego apenas uma letra (no caso 1 char tem 1 byte) e passo para t2 	
 			sb $t2, ($t0) #Armazeno o valor do indice (letra) atual no endereço de t0 (indice do array destino) 
 			beq $t2, $zero, fim  #loop quando chegar no fim da string (\0)
 
