@@ -3,7 +3,6 @@
 	strB:	.asciiz "laje"
 
 .text
-.globl test
 
 test:
 	# Mostra strA
