@@ -1,7 +1,7 @@
 .data
 	# Constantes
 	.eqv MESA_TAM		49 # O tamanho em bytes de uma mesa ma memória
-	.eqv MESA_COUNT		20 # Quantidade de mesas no array
+	.eqv MESA_COUNT		15 # Quantidade de mesas no array
 	
 	# offsets para separar onde fica cada atributo na memória alocada da mesa
 	.eqv OFFSET_ID		0
@@ -10,27 +10,67 @@
 	.eqv OFFSET_TELEFONE	35
 	.eqv OFFSET_ENDERECO    48
 
-	arr_mesas: .space 		980   # 20 * 49 = 980 bytes
+	arr_mesas: .space 		735   # 15 * 49 = 980 bytes
+
+	.macro get_mesa(%reg_preservar)
+	    addi $sp, $sp, -8			# Armazena 2 bytes na pilha
+	    sw   $ra, 4($sp)			# Preserva a entradas da função, e endereço correto na pilha antes de chamar a busca   
+	    sw   %reg_preservar, 0($sp)
+	    jal  buscar_mesa_id			# Busca o endereço da mesa de mesmo ID
+	    lw   %reg_preservar, 0($sp) # restaura a entrada original
+	    lw   $ra, 4($sp)			# Restaura o endereço do return
+	    addi $sp, $sp, 8
+	.end_macro
+
+	## .data de testes
+
+	telefone_teste1: 	.asciiz "81 99090-9090"
+	telefone_teste2: 	.asciiz "81 98080-8080"
+
 .text
 .globl buscar_mesa_id
 .globl set_is_ocupada
 
 # Essa função inteira pode ser removida
 test:
-	la 	$s0, arr_mesas	# Endereço inicial do array das mesas
+	la 		$s0, arr_mesas	# Endereço inicial do array das mesas
+	
+	# Teste se consigo ocupar uma mesa
 	move 	$a0, $0 	# índice = 0
 	jal  	buscar_mesa_id
-	lb 	$a0, OFFSET_OCUPADA($v0)
+	lb 		$a0, OFFSET_OCUPADA($v0)
 	jal 	print_int	# Imprime o estado atual da mesa[0]
 
 	move 	$a0, $0
-	li 	$a1, 1
+	li 		$a1, 1
 	jal 	set_is_ocupada
 
 	move 	$a0, $0 	
 	jal  	buscar_mesa_id
 	lb 	$a0, OFFSET_OCUPADA($v0)
 	jal 	print_int
+
+	## Teste se consigo trocar um número:
+
+	move 	$a0, $0
+	la 		$a1, telefone_teste1 	# inserindo o primeiro número para o set
+	jal 	set_telefone
+
+	move 	$a0, $0
+	jal 	buscar_mesa_id
+	addi 	$a0, $v0, OFFSET_TELEFONE	# $a0 = endereço do campo telefone
+	jal 	print						# Imprime "81 99090-9090"
+
+	# trocando o número pela segunda vez
+	move 	$a0, $0
+	la 		$a1, telefone_teste2	# fonte = "81 98080-8080"
+	jal 	set_telefone
+
+	move 	$a0, $0
+	jal 	buscar_mesa_id
+	addi 	$a0, $v0, OFFSET_TELEFONE	# $a0 = endereço do campo telefone
+	jal 	print						# Imprime "81 98080-8080"
+
 
 	j 	sair
 
@@ -41,33 +81,34 @@ buscar_mesa_id:
 	mul 	$t3, $a0, $t1   # i * MESA_TAM
 	add 	$t4, $t3, $s0   # t4 = &mesas[i]
 	
-	lw 	$v1, OFFSET_ID($t4) 	# Retorna
-	move 	$v0, $t4 	  	# $v0 = t4
+	lw 	$v1, OFFSET_ID($t4) 	# endereço da mesa
+	move 	$v0, $t4 	  	# valor da struct
 	jr 	$ra
 
 # Assumindo que $s0 tem o endereço do array das mesas, e $a0 o índice buscado
 # e $a1 1 ou 0, para definir se a mesa será ocupada
 set_is_ocupada:
-	addi 	$sp, $sp, -8	# Armazena 2 bytes na pilha
-	sw   	$ra, 4($sp)	# Preserva a entradas da função, e endereço correto na pilha antes de chamar a busca   
-    	sw   	$a1, 0($sp)
+	get_mesa 	$a1
 
-	jal 	buscar_mesa_id  # Busca o endereço da mesa de mesmo ID
-
-	lw   $a1, 0($sp)        # restaura a entrada original
-    	lw   $ra, 4($sp)	# Restaura o endereço do return
-    	addi $sp, $sp, 8
-
-    	beq  $a1, $zero, set_livre
+	beq  $a1, $zero, set_livre
 	
 	set_ocupada:
-	    li   $t1, 1
-	    sb   $t1, OFFSET_OCUPADA($v0)
-	    jr   $ra
+    li   $t1, 1
+    sb   $t1, OFFSET_OCUPADA($v0)
+    jr   $ra
 
 	set_livre:
-		sb   $zero, OFFSET_OCUPADA($v0)
-		jr   $ra
+	sb   $zero, OFFSET_OCUPADA($v0)
+	jr   $ra
+
+# Assumindo que $s0 tem o endereço do array das mesas, e $a0 o índice buscado
+# e que $a1 tem o número de contato
+set_telefone:
+	get_mesa $a1
+
+	addi 	$a0, $v0, OFFSET_TELEFONE 	# $t0 é o ponteiro para o destino
+	j 		strcpy
+
 sair:
 	addi 		$v0, $0, 10 # Serviço para encerrar o programa
 	syscall		
