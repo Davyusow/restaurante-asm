@@ -106,8 +106,28 @@ set_is_ocupada:
 set_telefone:
 	get_mesa $a1
 
-	addi 	$a0, $v0, OFFSET_TELEFONE 	# $t0 é o ponteiro para o destino
+	addi 	$a0, $v0, OFFSET_TELEFONE 	# $t0 é o ponterio para o destino
 	j 		strcpy
+
+# Assumindo que $s0 tem o endereço do array das mesas
+# TODO: Falta inserir aqui a limpeza dos 
+formatar_mesas:
+	li 		$t0, 0 		# i = 0
+	
+loop_mesas:
+	bge 	$t0, MESA_COUNT, fim_fmt_mesa	# se i >= MESA_COUNT sai do loop
+
+	move 	$a0, $t0 	# $a0 = i
+	li 		$ai, 0 		# $ai = 0 para desocupar
+	jal 	set_is_ocupada
+
+	addi 	$t0, $t0, 1 # i++
+
+	j loop_mesas
+
+fim_fmt_mesa:
+	jr 		$ra
+
 
 sair:
 	addi 		$v0, $0, 10 # Serviço para encerrar o programa
