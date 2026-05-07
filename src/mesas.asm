@@ -30,6 +30,11 @@
 	telefone_novo: .asciiz "81 98765-4321"
 	nome_novo:     .asciiz "Maria Santos"
 
+	msg_sucesso:		.asciiz "Atendimento iniciado com sucesso"
+	msg_mesa_ocupada:	.asciiz "Falha: mesa ocupada"
+	msg_mesa_inexistente:	.asciiz "Falha: mesa inexistente"
+	quebra_linha:		.asciiz "\n"
+
 .text
 .globl buscar_mesa_id
 .globl set_is_ocupada
@@ -83,50 +88,107 @@ test:
 	jal  iniciar_mesa
 	
 	# Verificar se foi ocupada
-	li   $a0, 5
+	li   $a0, 4
 	jal  buscar_mesa_id
 	lb   $a0, OFFSET_OCUPADA($v0)
 	jal  print_int           # Deve imprimir 1
 	
 	# Verificar telefone
-	li   $a0, 5
+	li   $a0, 4
 	jal  buscar_mesa_id
 	addi $a0, $v0, OFFSET_TELEFONE
 	jal  print               # "81 98765-4321"
 
-	li   $a0, 5
+	li   $a0, 4
 	jal  buscar_mesa_id
 	addi $a0, $v0, OFFSET_RESPONSAVEL
 	jal  print               # "Maria Santos"
+
+	## Teste dos erros
+
+	# ID inválido > 15
+	li   $a0, 16                    
+	jal  iniciar_mesa
+	
+	# ID inválido < 1
+	li   $a0, 0                     # Mesa 0 não existe
+	jal  iniciar_mesa
+	
+	# mesa já ocupada
+	li   $a0, 5                     # Mesa 5 já foi ocupada antes
+	jal  iniciar_mesa
 
 	j 	sair
 
 # Assumindo que $s0 tem o endereço do array das mesas, e $a0 o índice
 iniciar_mesa:
-	addiu 	$sp, $sp, -16 	# para $ra + 3 argumentos
-	sw 		$ra, 12($sp)	# preserva retorno de quem chamou iniciar_mesa
-	sw 		$a0, 8($sp)	  	# Salva o id
-	sw 		$a1, 4($sp)		# Salva o telefone
-	sw 		$a2, 0($sp)   	# Salva o nome
+	addiu 	$sp, $sp, -20 	# para $ra + 3 argumentos
+	sw 		$ra, 16($sp)	# preserva retorno de quem chamou iniciar_mesa
+	sw 		$a0, 12($sp)	  	# Salva o id
+	sw 		$a1, 8($sp)		# Salva o telefone
+	sw 		$a2, 4($sp)   	# Salva o nome
+
+	li 		$t0, 1
+	li 		$t1, 15
+	
+	blt 	$a0, $t0, mesa_inexistente	# se id < 1, mesa inexistente
+	bgt 	$a0, $t1, mesa_inexistente	# se id > 15, mesa inexistente
+	addi 	$a0, $a0, -1
+
+	jal  	buscar_mesa_id 	# Busca o índice correto
+	move 	$t2, $v0 		# Endereço da mesa
+	lb 		$t3, OFFSET_OCUPADA($t2)	# $t3 é o status de ocupada
+
+	bne 	$t3, $0, mesa_ja_ocupada
 
 	# Chama o set_telefone
-	lw 		$a0, 8($sp)		# Recupera o id
-	lw 		$a1, 4($sp) 	# Recupera o telefone
+	move 	$a0, $a0		# Mantém o id
+	lw 		$a1, 8($sp) 	# Recupera o telefone
 	jal 	set_telefone
 
 	# Chama set_responsavel
-	lw 		$a0, 8($sp)		# Recupera o id
-	lw 		$a1, 0($sp) 	# Recupera o nome
+	lw 		$a0, 12($sp)		# Recupera o id
+	addi 	$a0, $a0, -1		# Corrige o id
+	lw 		$a1, 4($sp) 	# Recupera o nome
 	jal 	set_nome_responsavel
 
 	# Chama set_is_ocupada
-	lw 		$a0, 8($sp)		# Recupera o id
+	lw 		$a0, 12($sp)		# Recupera o id
+	addi 		$a0, $a0, -1  		# Converte o índice
 	li 		$a1, 1 			# Ocupar
 	jal 	set_is_ocupada
 
-	lw 		$ra, 12($sp)
-	addiu 	$sp, $sp, 16
+	la 		$a0, msg_sucesso
+	jal 	print
+	la 		$a0, quebra_linha
+	jal 	print
+	
+	li 		$v0, 0						# Retorna 0 (sucesso)
+	
+	j 		iniciar_mesa_fim
+
+mesa_inexistente:
+	la 		$a0, msg_mesa_inexistente
+	jal 	print
+	la 		$a0, quebra_linha
+	jal 	print
+	
+	li 		$v0, 1						# Retorna 1 (mesa inexistente)
+	j 		iniciar_mesa_fim
+
+mesa_ja_ocupada:
+	la 		$a0, msg_mesa_ocupada
+	jal 	print
+	la 		$a0, quebra_linha
+	jal 	print
+	
+	li 		$v0, 2						# Retorna 2 (mesa ocupada)
+
+iniciar_mesa_fim:
+	lw 		$ra, 16($sp)
+	addiu 	$sp, $sp, 20
 	jr 		$ra
+
 
 # Assumindo que $s0 tem o endereço do array das mesas, e $a0 o índice buscado
 # $v0: Retorna o valor da struct , $v1: Retorna o endereço da mesa
