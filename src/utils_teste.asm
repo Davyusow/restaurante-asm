@@ -4,7 +4,7 @@
 
 .text
 
-test:
+test_utils:
 	# Mostra strA
 	la 		$a0, strA
 	jal 	print
