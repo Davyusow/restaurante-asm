@@ -32,15 +32,11 @@
 	msg_item_adicionado:		.asciiz "Item adicionado com sucesso"
 	msg_item_removido:			.asciiz "Item removido com sucesso"
 	msg_item_invalido:			.asciiz "Falha: codigo do item invalido"
-	msg_item_nao_cadastrado:	.asciiz "Falha: item não cadastrado no cardápio"
+	msg_item_nao_cadastrado:	.asciiz "Falha: item nao cadastrado no cardapio"
 	msg_item_nao_consta:		.asciiz "Falha: item nao consta na conta"
 	msg_pagamento_realizado:	.asciiz "Pagamento realizado com sucesso"
-	msg_saldo_devedor:			.asciiz "Falha: saldo devedor ainda não quitado. Valor restante: R$ "
+	msg_saldo_devedor:			.asciiz "Falha: saldo devedor ainda nao quitado. Valor restante: "
 	msg_mesa_fechada:			.asciiz "Mesa fechada com sucesso"
-	msg_relatorio_itens:		.asciiz "--- Itens pedidos ---"
-	msg_relatorio_total:		.asciiz "Valor total: "
-	msg_relatorio_pago:			.asciiz "Valor pago: "
-	msg_relatorio_devedor:		.asciiz "Saldo devedor: "
 	quebra_linha:				.asciiz "\n"
 	
 	.align 4
@@ -133,9 +129,10 @@ iniciar_mesa_fim:
 buscar_mesa_id:
 	li 	$t1, MESA_TAM   # para trocar a mesa de forma mais direta
 	mul 	$t3, $a0, $t1   # i * MESA_TAM
-	add 	$t4, $t3, $s0   # t4 = &mesas[i]
+	la 	$t5, arr_mesas
+	add 	$t4, $t3, $t5   # t4 = &mesas[i]
 	
-	lw 	$v1, OFFSET_ID($t4) 	# endereço da mesa
+	lw 	$v1, OFFSET_ID($t4) 	# endereco da mesa
 	move 	$v0, $t4 	  	# valor da struct
 	jr 	$ra
 
@@ -257,8 +254,15 @@ mesa_ad_item:
 	lb 		$t3, OFFSET_OCUPADA($t2)
 	beq 	$t3, $zero, ad_item_nao_iniciado
 	
-	# TODO: Verificar se item existe no cardápio (chamar função de cardápio)
-	# Por enquanto, apenas adicionar o item
+	# Verificar se item existe no cardapio
+	lw 	$t0, 4($sp)
+	addi 	$t0, $t0, -1
+	li 	$t1, 40
+	mul 	$t0, $t0, $t1
+	la 	$t1, cardapio
+	addu 	$t1, $t1, $t0
+	lw 	$t9, 0($t1)
+	beq 	$t9, $zero, ad_item_nao_cadastrado
 	
 	# Procurar espaço na comanda ou incrementar quantidade se já existe
 	lw 		$a0, 4($sp)  # Recuperar ID do item
@@ -338,6 +342,14 @@ ad_item_invalido:
 	la 		$a0, quebra_linha
 	jal 	print
 	li 		$v0, 3
+	j 		ad_item_fim
+
+ad_item_nao_cadastrado:
+	la 		$a0, msg_item_nao_cadastrado
+	jal 	print
+	la 		$a0, quebra_linha
+	jal 	print
+	li 		$v0, 4
 	
 ad_item_fim:
 	lw 		$ra, 12($sp)
@@ -446,9 +458,10 @@ rm_item_fim:
 # mesa_pagar: $a0 = id_mesa (1-15), $a1 = valor em centavos
 # Retorna: $v0 = 0 (sucesso), 1 (mesa inexistente), 2 (mesa não iniciada)
 mesa_pagar:
-	addiu 	$sp, $sp, -12
-	sw 		$ra, 8($sp)
-	sw 		$a0, 4($sp)
+	addiu 	$sp, $sp, -16
+	sw 		$ra, 12($sp)
+	sw 		$a0, 8($sp)
+	sw 		$a1, 4($sp)
 	
 	# Validar ID da mesa
 	li 		$t0, 1
@@ -469,6 +482,22 @@ mesa_pagar:
 	lw 		$t4, OFFSET_TOTAL_PAGO($t2)
 	add 	$t4, $t4, $a1
 	sw 		$t4, OFFSET_TOTAL_PAGO($t2)
+
+	# Recalcular saldo devedor (total - pago)
+	move 	$a0, $t2
+	jal 	calc_total_mesa
+	move 	$t5, $v0
+	lw 		$t6, OFFSET_TOTAL_PAGO($t2)
+	slt 		$t7, $t6, $t5
+	beq 		$t7, $zero, pagar_saldo_zero
+	subu 		$t8, $t5, $t6
+	j 		pagar_store_saldo
+
+pagar_saldo_zero:
+	move 	$t8, $zero
+
+pagar_store_saldo:
+	sw 		$t8, OFFSET_SALDO_DEVEDOR($t2)
 	
 	la 		$a0, msg_pagamento_realizado
 	jal 	print
@@ -493,9 +522,46 @@ pagar_nao_iniciado:
 	li 		$v0, 2
 	
 pagar_fim:
-	lw 		$ra, 8($sp)
-	addiu 	$sp, $sp, 12
+	lw 		$ra, 12($sp)
+	addiu 	$sp, $sp, 16
 	jr 		$ra
+
+
+# calc_total_mesa: $a0 = endereco da mesa
+# Retorna: $v0 = total em centavos
+calc_total_mesa:
+	move 	$t0, $a0
+	addi 	$t0, $t0, OFFSET_COMANDA
+	li 	$t1, 0
+	li 	$t2, 0
+
+calc_total_loop:
+	li 	$t3, COMANDA_MAX
+	beq 	$t1, $t3, calc_total_done
+
+	lw 	$t4, 0($t0)
+	beq 	$t4, $zero, calc_total_next
+	lw 	$t5, 4($t0)
+
+	addi 	$t6, $t4, -1
+	li 	$t7, 40
+	mul 	$t6, $t6, $t7
+	la 	$t7, cardapio
+	addu 	$t7, $t7, $t6
+	lw 	$t8, 0($t7)
+	beq 	$t8, $zero, calc_total_next
+	lw 	$t9, 4($t7)
+	mul 	$t9, $t9, $t5
+	addu 	$t2, $t2, $t9
+
+calc_total_next:
+	addi 	$t0, $t0, 8
+	addi 	$t1, $t1, 1
+	j 	calc_total_loop
+
+calc_total_done:
+	move 	$v0, $t2
+	jr 	$ra
 
 
 # mesa_fechar: $a0 = id_mesa (1-15)
@@ -516,10 +582,17 @@ mesa_fechar:
 	jal 	buscar_mesa_id
 	move 	$t2, $v0  # Endereço da mesa
 	
-	# Verificar saldo devedor (TODO: calcular saldo_devedor = total - pago)
-	lw 		$t3, OFFSET_SALDO_DEVEDOR($t2)
-	bne 	$t3, $zero, fechar_saldo_devedor
-	
+	# Verificar saldo devedor (total - pago)
+	move 	$a0, $t2
+	jal 	calc_total_mesa
+	move 	$t3, $v0
+	lw 		$t4, OFFSET_TOTAL_PAGO($t2)
+	slt 		$t5, $t4, $t3
+	beq 		$t5, $zero, mesa_fechar_ok
+	subu 		$t6, $t3, $t4
+	j 		fechar_saldo_devedor
+
+mesa_fechar_ok:
 	# Desocupar mesa
 	li 		$a0, 0  # índice já corrigido
 	lw 		$a0, 4($sp)
@@ -567,10 +640,11 @@ fechar_mesa_inexistente:
 	
 fechar_saldo_devedor:
 	la 		$a0, msg_saldo_devedor
-	jal 	print
-	# TODO: Formatar valor em R$ XXXX,XX
-	la 		$a0, quebra_linha
-	jal 	print
+	jal 	print_raw
+	move 	$a0, $t6
+	jal 	mmio_print_money
+	li 		$a0, 10
+	jal 	mmio_write_char
 	li 		$v0, 2
 	
 fechar_fim:
@@ -604,36 +678,60 @@ mesa_parcial:
 	lb 		$t3, OFFSET_OCUPADA($t2)
 	beq 	$t3, $zero, parcial_mesa_nao_iniciada
 	
-	# Imprimir cabeçalho do relatório
-	la 		$a0, msg_relatorio_itens
-	jal 	print
+	# Listar itens e quantidades
+	addi 	$t4, $t2, OFFSET_COMANDA
+	li 		$t5, 0
+
+parcial_itens_loop:
+	li 		$t6, COMANDA_MAX
+	beq 		$t5, $t6, parcial_totais
 	
-	# TODO: Listar itens da comanda com quantidades
-	# Por enquanto, apenas imprimir os totais
+	lw 		$t7, 0($t4)
+	beq 		$t7, $zero, parcial_itens_next
+
+	move 	$a0, $t7
+	jal 	mmio_print_int
+	li 		$a0, 32
+	jal 	mmio_write_char
+
+	lw 		$t8, 4($t4)
+	move 	$a0, $t8
+	jal 	mmio_print_int
+	li 		$a0, 10
+	jal 	mmio_write_char
+
+parcial_itens_next:
+	addi 	$t4, $t4, 8
+	addi 	$t5, $t5, 1
+	j 		parcial_itens_loop
+
+parcial_totais:
+	move 	$a0, $t2
+	jal 	calc_total_mesa
+	move 	$t9, $v0
 	
-	# Imprimir valor total
-	la 		$a0, msg_relatorio_total
-	jal 	print_raw
-	lw 		$a0, OFFSET_TOTAL_PAGO($t2)
-	jal 	print_int
-	la 		$a0, quebra_linha
-	jal 	print
-	
-	# Imprimir valor pago
-	la 		$a0, msg_relatorio_pago
-	jal 	print_raw
-	lw 		$a0, OFFSET_TOTAL_PAGO($t2)
-	jal 	print_int
-	la 		$a0, quebra_linha
-	jal 	print
-	
-	# Imprimir saldo devedor
-	la 		$a0, msg_relatorio_devedor
-	jal 	print_raw
-	lw 		$a0, OFFSET_SALDO_DEVEDOR($t2)
-	jal 	print_int
-	la 		$a0, quebra_linha
-	jal 	print
+	lw 		$t0, OFFSET_TOTAL_PAGO($t2)
+	slt 		$t1, $t0, $t9
+	beq 		$t1, $zero, parcial_saldo_zero
+	subu 		$t2, $t9, $t0
+	j 		parcial_print_totais
+
+parcial_saldo_zero:
+	move 	$t2, $zero
+
+parcial_print_totais:
+	move 	$a0, $t9
+	jal 	mmio_print_money
+	li 		$a0, 10
+	jal 	mmio_write_char
+	move 	$a0, $t0
+	jal 	mmio_print_money
+	li 		$a0, 10
+	jal 	mmio_write_char
+	move 	$a0, $t2
+	jal 	mmio_print_money
+	li 		$a0, 10
+	jal 	mmio_write_char
 	
 	li 		$v0, 0
 	j 		parcial_fim

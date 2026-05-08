@@ -1,13 +1,11 @@
 .data
     .globl cardapio
     cardapio: .space 800 #cada item tem 40 bytes
-    msg_invalido: .asciiz "Posição inválida"
-    msg_ocupado: .asciiz "Já existe um item nessa posição do cardápio"
-    msg_vazio: .asciiz "Não existe um item nessa posição do cardápio"
-    str_id:    .asciiz "ID: "
-    str_desc:  .asciiz "Descrição: "
-    str_preco: .asciiz "Preço: "
-    str_nl:    .asciiz "\n"
+    msg_invalido: .asciiz "Falha: codigo de item invalido"
+    msg_ocupado: .asciiz "Falha: numero de item ja cadastrado"
+    msg_vazio: .asciiz "Codigo informado nao possui item cadastrado no cardapio"
+    msg_add_ok: .asciiz "Item adicionado com sucesso"
+    msg_rm_ok: .asciiz "Item removido com sucesso"
 .text
     .globl formatar_cardapio
     formatar_cardapio:
@@ -53,6 +51,8 @@
 
         lw $ra, 0($sp)
         addi $sp, $sp, 4
+        la $a0, msg_add_ok
+        jal print
         jr $ra #retorna para o programa principal
     .globl remover_item_cardapio
     remover_item_cardapio:
@@ -76,22 +76,21 @@
         
         sb $zero, 8($t3) # apaga a descricao com \0
 
+        la $a0, msg_rm_ok
+        jal print
         jr $ra # retorna para o programa principal
 
     erro_invalido:
         la $a0, msg_invalido #imprime string
-        li $v0, 4
-        syscall
+        jal print
         jr $ra
     erro_ocupado:
         la $a0, msg_ocupado #imprime string
-        li $v0, 4
-        syscall
+        jal print
         jr $ra
     erro_vazio:
         la $a0, msg_vazio #imprime string
-        li $v0, 4
-        syscall
+        jal print
         jr $ra
     .globl listar_cardapio
     listar_cardapio:
@@ -105,38 +104,20 @@
         lw $t3, 0($t0)
         beq $t3, $zero, proximo_item #se comecar com zero entao a posicao está vázio e nao há nada a imprimir
 
-        #label id
-        la $a0, str_id
-        li $v0, 4
-        syscall
+        move $a0, $t3
+        jal mmio_print_int
+        li $a0, 32
+        jal mmio_write_char
 
-        move $a0, $t3           # move o valor para a0, (requisito do print)
-        li $v0, 1               # print inteiro
-        syscall
+        lw $a0, 4($t0)
+        jal mmio_print_money
+        li $a0, 32
+        jal mmio_write_char
 
-        #printa label descricao
-        la $a0, str_desc
-        li $v0, 4  
-        syscall
-
-
-        addi $a0, $t0, 8        # pega a string, já com o offset do cardapio e joga em a0 (requisito do print) 
-        li $v0, 4
-        syscall
-
-        #printa label preco
-        la $a0, str_preco
-        li $v0, 4
-        syscall
-
-        lw $a0, 4($t0)          # pega o preco, já com offset do cardapio e joga em a0 (requisito do print)
-        li $v0, 1
-        syscall
-
-        #printa quebra de linha para formatacao
-        la $a0, str_nl
-        li $v0, 4
-        syscall
+        addi $a0, $t0, 8
+        jal mmio_print_string
+        li $a0, 10
+        jal mmio_write_char
 
     proximo_item:
         addi $t0, $t0, 40       # ajusta o offset para o proximo item
