@@ -1,4 +1,5 @@
 .data
+    .align 4
     .globl cardapio
     cardapio: .space 800 #cada item tem 40 bytes
     msg_invalido: .asciiz "Posição inválida"
