@@ -124,16 +124,17 @@ mmio_imprimir_tela:
 	li $s0, 0xFFFF0000 # $s0 Recebe o ENDERECO do Receiver Control, que sera usado como base para acessar os outros registradores
 	add $t4, $a0, $zero # Armazena em $t4 o indice zero do array da string a ser impressa
 
+
+	espera_Transmitter_disponivel_2: # Enquanto o ultimo bit do Transmitter Control for zero, ou seja, nao estiver disponivel para escrever, tente novamente, ate estar
+		lw $t3, 8($s0) # Recebe o VALOR do Transmitter Control
+		beq $t3, $zero, espera_Transmitter_disponivel_2 # Se estiver ocupado continua esperando
+
 	lb $t2, ($t4) # Escrevo em $t2 um caractere da string a ser impressa
 	beq $t2, $zero, fim_impressao # Se o caractere for \0, ou seja, o fim da string, termina a impressao
-
-	espera_Transmitter_disponivel: # Enquanto o ultimo bit do Transmitter Control for zero, ou seja, nao estiver disponivel para escrever, tente novamente, ate estar
-		lw $t3, 8($s0) # Recebe o VALOR do Transmitter Control
-		beq $t3, $zero, espera_Transmitter_disponivel # Se estiver ocupado continua esperando
-
+	
 	sw $t2, 12($s0) # Armazena em Transmitter Data esse caractere
 	addi $t4, $t4, 1 # Desloco o indice para o proximo caractere da string
-	j espera_Transmitter_disponivel # Volta para o loop de impressao, para imprimir o proximo caractere
+	j espera_Transmitter_disponivel_2 # Volta para o loop de impressao, para imprimir o proximo caractere
 
 	fim_impressao:
 		jr $ra # Volta para o lugar onde a funcao foi chamada
@@ -143,7 +144,7 @@ mmio_imprimir_tela:
 mmio_dividir_token:
 
 	beq $a0, $zero, string_nula # Se o endereco da string for zero, ou seja, nao houver string, termina a funcao
-	addi $t4, $a0, $zero # Armazena em $t4 o indice zero do array da string a ser dividida
+	add $t4, $a0, $zero # Armazena em $t4 o indice zero do array da string a ser dividida
 	
 	mmio_dividir_token_loop:
 	# $t5 vai receber o VALOR do indice atual da string
@@ -300,7 +301,7 @@ mmio_dividir_token:
 
 
 	cmd_cardapio_ad: # 3 argumentoss <option1>-<option2>-<option3>
-	move $a0, $v1 # Passo como argumento o resto, ou seja, os argumentos da funcao
+	move $a0, $s1 # Passo como argumento o resto, ou seja, os argumentos da funcao # Checar linha 213 para entender pq uso $s1 aqui
 	jal mmio_dividir_token # Vai dividir os argumentos da funcao
 	move $a0, $v0 # Passo como argumento em $a0 a primeira parte do token <option1>
 	jal apin # Transformo esse token em inteiro
@@ -324,30 +325,34 @@ mmio_dividir_token:
 	move $a1, $t1
 	move $a2, $t2
 	
-	jal adicionar_item_cardapio #chamo a funcao
+	#jal adicionar_item_cardapio #chamo a funcao
+	j checar_fim # Pulo para o fim da funcao onde a sp vai ser zerada e o endereco da main retornado para o $ra
 
 	cmd_cardapio_rm: # 1 argumento <option1>
-	move $a0, $v1 # Passo como argumento o resto, ou seja, os argumentos da funcao
+	move $a0, $s1 # Passo como argumento o resto, ou seja, os argumentos da funcao # Checar linha 213 para entender pq uso $s1 aqui
 	jal apin # Transformo esse token em inteiro
 	move $t0, $v0 # Escreve em $t0 o argumento
 
 	#Passagem dos argumentos para os devidos registradores
 	move $a0, $t0
 
-	jal remover_item_cardapio
+	#jal remover_item_cardapio
+	j checar_fim # Pulo para o fim da funcao onde a sp vai ser zerada e o endereco da main retornado para o $ra
 
 
 	cmd_cardapio_list: # Sem argumentos
 
-	jal listar_cardapio 
+	#jal listar_cardapio 
+	j checar_fim # Pulo para o fim da funcao onde a sp vai ser zerada e o endereco da main retornado para o $ra
 
 	cmd_cardapio_format: # Sem argumentos
 
-	jal formatar_cardapio
+	#jal formatar_cardapio
+	j checar_fim # Pulo para o fim da funcao onde a sp vai ser zerada e o endereco da main retornado para o $ra
 
 	cmd_mesa_iniciar: # 3 argumentos <option1>-<option2>-<option3>
 
-	move $a0, $v1 # Passo como argumento o resto, ou seja, os argumentos da funcao
+	move $a0, $s1 # Passo como argumento o resto, ou seja, os argumentos da funcao # Checar linha 213 para entender pq uso $s1 aqui
 	jal mmio_dividir_token # Vai dividir os argumentos da funcao
 	move $a0, $v0 # Passo como argumento em $a0 a primeira parte do token <option1>
 	jal apin # Transformo esse token em inteiro
@@ -371,12 +376,13 @@ mmio_dividir_token:
 	move $a1, $t1
 	move $a2, $t2
 
-	jal iniciar_mesa
+	#jal iniciar_mesa
+	j checar_fim # Pulo para o fim da funcao onde a sp vai ser zerada e o endereco da main retornado para o $ra
 
 
 	cmd_mesa_ad_item: # 2 argumentos <option1>-<option2>
 
-	move $a0, $v1 # Passo como argumento o resto, ou seja, os argumentos da funcao
+	move $a0, $s1 # Passo como argumento o resto, ou seja, os argumentos da funcao # Checar linha 213 para entender pq uso $s1 aqui
 	jal mmio_dividir_token # Vai dividir os argumentos da funcao
 	move $a0, $v0 # Passo como argumento em $a0 a primeira parte do token <option1>
 	jal apin # Transformo esse token em inteiro
@@ -390,11 +396,12 @@ mmio_dividir_token:
 	move $a0, $t0
 	move $a1, $t1
 
-	jal mesa_ad_item
+	#jal mesa_ad_item
+	j checar_fim # Pulo para o fim da funcao onde a sp vai ser zerada e o endereco da main retornado para o $ra
 
 	cmd_mesa_rm_item: # 2 argumentos <option1>-<option2>
 
-	move $a0, $v1 # Passo como argumento o resto, ou seja, os argumentos da funcao
+	move $a0, $s1 # Passo como argumento o resto, ou seja, os argumentos da funcao # Checar linha 213 para entender pq uso $s1 aqui
 	jal mmio_dividir_token # Vai dividir os argumentos da funcao
 	move $a0, $v0 # Passo como argumento em $a0 a primeira parte do token <option1>
 	jal apin # Transformo esse token em inteiro
@@ -408,26 +415,29 @@ mmio_dividir_token:
 	move $a0, $t0
 	move $a1, $t1
 
-	jal mesa_rm_item
+	#jal mesa_rm_item
+	j checar_fim # Pulo para o fim da funcao onde a sp vai ser zerada e o endereco da main retornado para o $ra
 
 	cmd_mesa_format: # Sem argumentos
 
-	jal formatar_mesas
+	#jal formatar_mesas
+	j checar_fim # Pulo para o fim da funcao onde a sp vai ser zerada e o endereco da main retornado para o $ra
 
 	cmd_mesa_parcial: # 1 argumento <option1>
 
-	move $a0, $v1 # Passo como argumento o resto, ou seja, os argumentos da funcao
+	move $a0, $s1 # Passo como argumento o resto, ou seja, os argumentos da funcao # Checar linha 213 para entender pq uso $s1 aqui
 	jal apin # Transformo esse token em inteiro
 	move $t0, $v0 # Escreve em $t0 o argumento
 
 	#Passagem dos argumentos para os devidos registradores
 	move $a0, $t0
 
-	jal mesa_parcial
+	#jal mesa_parcial
+	j checar_fim # Pulo para o fim da funcao onde a sp vai ser zerada e o endereco da main retornado para o $ra
 
 	cmd_mesa_pagar: # 2 argumentos <option1>-<option2> 
 
-	move $a0, $v1 # Passo como argumento o resto, ou seja, os argumentos da funcao
+	move $a0, $s1 # Passo como argumento o resto, ou seja, os argumentos da funcao # Checar linha 213 para entender pq uso $s1 aqui
 	jal mmio_dividir_token # Vai dividir os argumentos da funcao
 	move $a0, $v0 # Passo como argumento em $a0 a primeira parte do token <option1>
 	jal apin # Transformo esse token em inteiro
@@ -441,35 +451,45 @@ mmio_dividir_token:
 	move $a0, $t0
 	move $a1, $t1
 
-	jal mesa_pagar
+	#jal mesa_pagar
+	j checar_fim # Pulo para o fim da funcao onde a sp vai ser zerada e o endereco da main retornado para o $ra
 
 	cmd_mesa_fechar: # 1 argumento <option1>
 
-	move $a0, $v1 # Passo como argumento o resto, ou seja, os argumentos da funcao
+	move $a0, $s1 # Passo como argumento o resto, ou seja, os argumentos da funcao # Checar linha 213 para entender pq uso $s1 aqui
 	jal apin # Transformo esse token em inteiro
 	move $t0, $v0 # Escreve em $t0 o argumento
 
 	#Passagem dos argumentos para os devidos registradores
 	move $a0, $t0
 
-	mesa_fechar
+	#jal mesa_fechar
+	j checar_fim # Pulo para o fim da funcao onde a sp vai ser zerada e o endereco da main retornado para o $ra
 
 	cmd_salvar: # Sem argumentos
 
-	jal
+	#jal
+	j checar_fim # Pulo para o fim da funcao onde a sp vai ser zerada e o endereco da main retornado para o $ra
 
 	cmd_recarregar: # Sem argumentos
 
-	jal
+	#jal
+	j checar_fim # Pulo para o fim da funcao onde a sp vai ser zerada e o endereco da main retornado para o $ra
 
 	cmd_formatar: # Sem argumentos
 
-	jal
+	#jal
+	j checar_fim # Pulo para o fim da funcao onde a sp vai ser zerada e o endereco da main retornado para o $ra
 
 
 	cmd_invalido:
 	la $a0, str_cmd_invalido
 	jal mmio_imprimir_tela
 
+	j checar_fim # Pulo para o fim da funcao onde a sp vai ser zerada e o endereco da main retornado para o $ra
+
+	checar_fim:
+	lw $ra, 0($sp)
+	addiu $sp, $sp, 4
 	jr $ra
 		
