@@ -383,12 +383,12 @@ mesa_rm_item:
 busca_item_rm:
 	bge 	$t5, COMANDA_MAX, rm_item_nao_consta
 	lw 		$t6, 0($t4)  # ID do item
-	beq 	$t6, $a0, rm_item_decrementа  # Item encontrado
+	beq 	$t6, $a0, rm_item_decrementou  # Item encontrado
 	addi 	$t4, $t4, 8
 	addi 	$t5, $t5, 1
 	j 		busca_item_rm
 	
-rm_item_decrementа:
+rm_item_decrementou:
 	lw 		$t6, 4($t4)  # Quantidade
 	addi 	$t6, $t6, -1
 	bne 	$t6, $zero, rm_item_decrementou
