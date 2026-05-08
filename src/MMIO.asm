@@ -306,7 +306,7 @@ mmio_dividir_token:
 	move $a0, $v0 # Passo como argumento em $a0 a primeira parte do token <option1>
 	jal apin # Transformo esse token em inteiro
 	
-	move $t0, $v0 # Escreve em $t0 o primeiro argumento
+	move $t3, $v0 # Escreve em $t3 o primeiro argumento
 
 	# A partir daqui o $v1 foi reescrito, assim esta <option2>-<option3>
 
@@ -314,16 +314,16 @@ mmio_dividir_token:
 	jal mmio_dividir_token # Divide <option2> de <option3>
 	move $a0, $v0 # Passo <option2> para $a0
 	jal apin # Transformo esse token em inteiro
-	move $t1, $v0 # Escreve em $t1 o segundo argumento
-
-	move $a0, $v1 # Passo <option3> para $a0
-	jal apin # Transformo esse token em inteiro
-	move $t2, $v0 # Escreve em $t2 o terceiro argumento
-
+	
+	# $t3 tem o valor do primeiro argumento
+	# $v0 tem o valor inteiro do segundo argumento
+	# $v1 tem o valor do terceiro argumento, que é a descricao do item, e nao precisa ser transformada em inteiro, pois é string
+	
+	
 	#Passagem dos argumentos para os devidos registradores
-	move $a0, $t0
-	move $a1, $t1
-	move $a2, $t2
+	move $a0, $t3
+	move $a1, $v0
+	move $a2, $v1 
 	
 	jal adicionar_item_cardapio #chamo a funcao
 	j checar_fim # Pulo para o fim da funcao onde a sp vai ser zerada e o endereco da main retornado para o $ra
@@ -357,24 +357,21 @@ mmio_dividir_token:
 	move $a0, $v0 # Passo como argumento em $a0 a primeira parte do token <option1>
 	jal apin # Transformo esse token em inteiro
 	
-	move $t0, $v0 # Escreve em $t0 o primeiro argumento
+	move $t3, $v0 # Escreve em $t3 o primeiro argumento
 
 	# A partir daqui o $v1 foi reescrito, assim esta <option2>-<option3>
 
 	move $a0, $v1 # Repete o processo para separar o resto dos tokens
 	jal mmio_dividir_token # Divide <option2> de <option3>
-	move $a0, $v0 # Passo <option2> para $a0
-	jal apin # Transformo esse token em inteiro
-	move $t1, $v0 # Escreve em $t1 o segundo argumento
-
-	move $a0, $v1 # Passo <option3> para $a0
-	jal apin # Transformo esse token em inteiro
-	move $t2, $v0 # Escreve em $t2 o terceiro argumento
+	
+	# $t3 contem <option1>
+	# $v0 contem <option2>  
+	# $v1 contem <option3>
 
 	#Passagem dos argumentos para os devidos registradores
-	move $a0, $t0
-	move $a1, $t1
-	move $a2, $t2
+	move $a0, $t3
+	move $a1, $v0
+	move $a2, $v1
 
 	jal iniciar_mesa
 	j checar_fim # Pulo para o fim da funcao onde a sp vai ser zerada e o endereco da main retornado para o $ra
@@ -386,15 +383,15 @@ mmio_dividir_token:
 	jal mmio_dividir_token # Vai dividir os argumentos da funcao
 	move $a0, $v0 # Passo como argumento em $a0 a primeira parte do token <option1>
 	jal apin # Transformo esse token em inteiro
-	move $t0, $v0 # Escreve em $t0 o primeiro argumento
+	move $t3, $v0 # Escreve em $t3 o primeiro argumento #ERRO
 
 	move $a0, $v1 # Passo como argumento em $a0 a segunda parte <option 2>
 	jal apin # Transformo esse token em inteiro
-	move $t1, $v0 # Escreve em $t1 o segundo argumento
+	move $v1, $v0 # Escreve em $v1 (que estava carregando a string <option 2>) o segundo argumento (agora carrega int <option 2>) bom que economiza registradores, evitando erros (abordagem menos é mais)
 
 	#Passagem dos argumentos para os devidos registradores
-	move $a0, $t0
-	move $a1, $t1
+	move $a0, $t3
+	move $a1, $v1
 
 	jal mesa_ad_item
 	j checar_fim # Pulo para o fim da funcao onde a sp vai ser zerada e o endereco da main retornado para o $ra
@@ -405,15 +402,15 @@ mmio_dividir_token:
 	jal mmio_dividir_token # Vai dividir os argumentos da funcao
 	move $a0, $v0 # Passo como argumento em $a0 a primeira parte do token <option1>
 	jal apin # Transformo esse token em inteiro
-	move $t0, $v0 # Escreve em $t0 o primeiro argumento
+	move $t3, $v0 # Escreve em $t3 o primeiro argumento #ERRO
 
 	move $a0, $v1 # Passo como argumento em $a0 a segunda parte <option 2>
 	jal apin # Transformo esse token em inteiro
-	move $t1, $v0 # Escreve em $t1 o segundo argumento
+	move $v1, $v0 # Escreve em $v1 (que estava carregando a string <option 2>) o segundo argumento (agora carrega int <option 2>) bom que economiza registradores, evitando erros (abordagem menos é mais)
 
 	#Passagem dos argumentos para os devidos registradores
-	move $a0, $t0
-	move $a1, $t1
+	move $a0, $t3
+	move $a1, $v1
 
 	jal mesa_rm_item
 	j checar_fim # Pulo para o fim da funcao onde a sp vai ser zerada e o endereco da main retornado para o $ra
@@ -441,15 +438,15 @@ mmio_dividir_token:
 	jal mmio_dividir_token # Vai dividir os argumentos da funcao
 	move $a0, $v0 # Passo como argumento em $a0 a primeira parte do token <option1>
 	jal apin # Transformo esse token em inteiro
-	move $t0, $v0 # Escreve em $t0 o primeiro argumento
+	move $t3, $v0 # Escreve em $t3 o primeiro argumento #ERRO
 
 	move $a0, $v1 # Passo como argumento em $a0 a segunda parte <option 2>
 	jal apin # Transformo esse token em inteiro
-	move $t1, $v0 # Escreve em $t1 o segundo argumento
+	move $v1, $v0 # Escreve em $v1 (que estava carregando a string <option 2>) o segundo argumento (agora carrega int <option 2>) bom que economiza registradores, evitando erros (abordagem menos é mais)
 
 	#Passagem dos argumentos para os devidos registradores
-	move $a0, $t0
-	move $a1, $t1
+	move $a0, $t3
+	move $a1, $v1
 
 	jal mesa_pagar
 	j checar_fim # Pulo para o fim da funcao onde a sp vai ser zerada e o endereco da main retornado para o $ra
