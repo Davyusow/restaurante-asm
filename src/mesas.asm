@@ -469,7 +469,18 @@ mesa_pagar:
 	lw 		$t4, OFFSET_TOTAL_PAGO($t2)
 	add 	$t4, $t4, $a1
 	sw 		$t4, OFFSET_TOTAL_PAGO($t2)
+
+	#Subtrair do saldo devedor
+	lw 		$t5, OFFSET_SALDO_DEVEDOR($t2)
+	bgt 	$a1, $t5, pagamento_maior
+	sub 	$t5, $t5, $a1 #Subtraio do valor pago atualmente apenas, não de todos os valores pagos, por isso nao passo $t4
+	sw		$t5, OFFSET_SALDO_DEVEDOR($t2)
+	j		pagamento_concluir
+
+	pagamento_maior:
+	sw $zero, OFFSET_SALDO_DEVEDOR($t2) # Se o pagamento for maior que o valor devedor, zera o valor devedor (não fica negativo)
 	
+	pagamento_concluir:
 	la 		$a0, msg_pagamento_realizado
 	jal 	print
 	la 		$a0, quebra_linha
