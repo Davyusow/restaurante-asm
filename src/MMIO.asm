@@ -325,7 +325,7 @@ mmio_dividir_token:
 	move $a1, $t1
 	move $a2, $t2
 	
-	#jal adicionar_item_cardapio #chamo a funcao
+	jal adicionar_item_cardapio #chamo a funcao
 	j checar_fim # Pulo para o fim da funcao onde a sp vai ser zerada e o endereco da main retornado para o $ra
 
 	cmd_cardapio_rm: # 1 argumento <option1>
@@ -336,18 +336,18 @@ mmio_dividir_token:
 	#Passagem dos argumentos para os devidos registradores
 	move $a0, $t0
 
-	#jal remover_item_cardapio
+	jal remover_item_cardapio
 	j checar_fim # Pulo para o fim da funcao onde a sp vai ser zerada e o endereco da main retornado para o $ra
 
 
 	cmd_cardapio_list: # Sem argumentos
 
-	#jal listar_cardapio 
+	jal listar_cardapio 
 	j checar_fim # Pulo para o fim da funcao onde a sp vai ser zerada e o endereco da main retornado para o $ra
 
 	cmd_cardapio_format: # Sem argumentos
 
-	#jal formatar_cardapio
+	jal formatar_cardapio
 	j checar_fim # Pulo para o fim da funcao onde a sp vai ser zerada e o endereco da main retornado para o $ra
 
 	cmd_mesa_iniciar: # 3 argumentos <option1>-<option2>-<option3>
@@ -376,7 +376,7 @@ mmio_dividir_token:
 	move $a1, $t1
 	move $a2, $t2
 
-	#jal iniciar_mesa
+	jal iniciar_mesa
 	j checar_fim # Pulo para o fim da funcao onde a sp vai ser zerada e o endereco da main retornado para o $ra
 
 
@@ -396,7 +396,7 @@ mmio_dividir_token:
 	move $a0, $t0
 	move $a1, $t1
 
-	#jal mesa_ad_item
+	jal mesa_ad_item
 	j checar_fim # Pulo para o fim da funcao onde a sp vai ser zerada e o endereco da main retornado para o $ra
 
 	cmd_mesa_rm_item: # 2 argumentos <option1>-<option2>
@@ -415,12 +415,12 @@ mmio_dividir_token:
 	move $a0, $t0
 	move $a1, $t1
 
-	#jal mesa_rm_item
+	jal mesa_rm_item
 	j checar_fim # Pulo para o fim da funcao onde a sp vai ser zerada e o endereco da main retornado para o $ra
 
 	cmd_mesa_format: # Sem argumentos
 
-	#jal formatar_mesas
+	jal formatar_mesas
 	j checar_fim # Pulo para o fim da funcao onde a sp vai ser zerada e o endereco da main retornado para o $ra
 
 	cmd_mesa_parcial: # 1 argumento <option1>
@@ -432,7 +432,7 @@ mmio_dividir_token:
 	#Passagem dos argumentos para os devidos registradores
 	move $a0, $t0
 
-	#jal mesa_parcial
+	jal mesa_parcial
 	j checar_fim # Pulo para o fim da funcao onde a sp vai ser zerada e o endereco da main retornado para o $ra
 
 	cmd_mesa_pagar: # 2 argumentos <option1>-<option2> 
@@ -451,7 +451,7 @@ mmio_dividir_token:
 	move $a0, $t0
 	move $a1, $t1
 
-	#jal mesa_pagar
+	jal mesa_pagar
 	j checar_fim # Pulo para o fim da funcao onde a sp vai ser zerada e o endereco da main retornado para o $ra
 
 	cmd_mesa_fechar: # 1 argumento <option1>
@@ -463,7 +463,7 @@ mmio_dividir_token:
 	#Passagem dos argumentos para os devidos registradores
 	move $a0, $t0
 
-	#jal mesa_fechar
+	jal mesa_fechar
 	j checar_fim # Pulo para o fim da funcao onde a sp vai ser zerada e o endereco da main retornado para o $ra
 
 	cmd_salvar: # Sem argumentos
