@@ -397,14 +397,14 @@ rm_item_decrementou:
 	sw 		$zero, 0($t4)
 	sw 		$zero, 4($t4)
 	
-rm_item_decrementou:
-	sw 		$t6, 4($t4)
-	la 		$a0, msg_item_removido
-	jal 	print
-	la 		$a0, quebra_linha
-	jal 	print
-	li 		$v0, 0
-	j 		rm_item_fim
+#rm_item_decrementou:
+#	sw 		$t6, 4($t4)
+#	la 		$a0, msg_item_removido
+#	jal 	print
+#	la 		$a0, quebra_linha
+#	jal 	print
+#	li 		$v0, 0
+#	j 		rm_item_fim
 	
 rm_item_mesa_inexistente:
 	la 		$a0, msg_mesa_inexistente

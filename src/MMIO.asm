@@ -468,17 +468,17 @@ mmio_dividir_token:
 
 	cmd_salvar: # Sem argumentos
 
-	#jal
+	jal salvar_persistencia
 	j checar_fim # Pulo para o fim da funcao onde a sp vai ser zerada e o endereco da main retornado para o $ra
 
 	cmd_recarregar: # Sem argumentos
 
-	#jal
+	jal carregar_persistencia
 	j checar_fim # Pulo para o fim da funcao onde a sp vai ser zerada e o endereco da main retornado para o $ra
 
 	cmd_formatar: # Sem argumentos
 
-	#jal
+	jal formatar_persistencia
 	j checar_fim # Pulo para o fim da funcao onde a sp vai ser zerada e o endereco da main retornado para o $ra
 
 
