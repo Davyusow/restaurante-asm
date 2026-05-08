@@ -127,13 +127,13 @@ mmio_imprimir_tela:
 	lb $t2, ($t4) # Escrevo em $t2 um caractere da string a ser impressa
 	beq $t2, $zero, fim_impressao # Se o caractere for \0, ou seja, o fim da string, termina a impressao
 
-	espera_Transmitter_disponivel: # Enquanto o ultimo bit do Transmitter Control for zero, ou seja, nao estiver disponivel para escrever, tente novamente, ate estar
+	espera_Transmitter_disponivel_2: # Enquanto o ultimo bit do Transmitter Control for zero, ou seja, nao estiver disponivel para escrever, tente novamente, ate estar
 		lw $t3, 8($s0) # Recebe o VALOR do Transmitter Control
-		beq $t3, $zero, espera_Transmitter_disponivel # Se estiver ocupado continua esperando
+		beq $t3, $zero, espera_Transmitter_disponivel_2 # Se estiver ocupado continua esperando
 
 	sw $t2, 12($s0) # Armazena em Transmitter Data esse caractere
 	addi $t4, $t4, 1 # Desloco o indice para o proximo caractere da string
-	j espera_Transmitter_disponivel # Volta para o loop de impressao, para imprimir o proximo caractere
+	j espera_Transmitter_disponivel_2 # Volta para o loop de impressao, para imprimir o proximo caractere
 
 	fim_impressao:
 		jr $ra # Volta para o lugar onde a funcao foi chamada
@@ -143,7 +143,7 @@ mmio_imprimir_tela:
 mmio_dividir_token:
 
 	beq $a0, $zero, string_nula # Se o endereco da string for zero, ou seja, nao houver string, termina a funcao
-	addi $t4, $a0, $zero # Armazena em $t4 o indice zero do array da string a ser dividida
+	add $t4, $a0, $zero # Armazena em $t4 o indice zero do array da string a ser dividida
 	
 	mmio_dividir_token_loop:
 	# $t5 vai receber o VALOR do indice atual da string
@@ -452,19 +452,19 @@ mmio_dividir_token:
 	#Passagem dos argumentos para os devidos registradores
 	move $a0, $t0
 
-	mesa_fechar
+	jal mesa_fechar
 
 	cmd_salvar: # Sem argumentos
 
-	jal
+	#jal
 
 	cmd_recarregar: # Sem argumentos
 
-	jal
+	#jal
 
 	cmd_formatar: # Sem argumentos
 
-	jal
+	#jal
 
 
 	cmd_invalido:
