@@ -302,6 +302,7 @@ mmio_dividir_token:
 
 	cmd_cardapio_ad: # 3 argumentoss <option1>-<option2>-<option3>
 	move $a0, $s1 # Passo como argumento o resto, ou seja, os argumentos da funcao # Checar linha 213 para entender pq uso $s1 aqui
+	beq $a0, $zero, cmd_invalido # Se nao houver argumentos, comando eh invalido, logo, termina a funcao
 	jal mmio_dividir_token # Vai dividir os argumentos da funcao
 	move $a0, $v0 # Passo como argumento em $a0 a primeira parte do token <option1>
 	jal apin # Transformo esse token em inteiro
@@ -330,6 +331,7 @@ mmio_dividir_token:
 
 	cmd_cardapio_rm: # 1 argumento <option1>
 	move $a0, $s1 # Passo como argumento o resto, ou seja, os argumentos da funcao # Checar linha 213 para entender pq uso $s1 aqui
+	beq $a0, $zero, cmd_invalido # Se nao houver argumentos, comando eh invalido, logo, termina a funcao
 	jal apin # Transformo esse token em inteiro
 	move $t0, $v0 # Escreve em $t0 o argumento
 
@@ -353,6 +355,7 @@ mmio_dividir_token:
 	cmd_mesa_iniciar: # 3 argumentos <option1>-<option2>-<option3>
 
 	move $a0, $s1 # Passo como argumento o resto, ou seja, os argumentos da funcao # Checar linha 213 para entender pq uso $s1 aqui
+	beq $a0, $zero, cmd_invalido # Se nao houver argumentos, comando eh invalido, logo, termina a funcao
 	jal mmio_dividir_token # Vai dividir os argumentos da funcao
 	move $a0, $v0 # Passo como argumento em $a0 a primeira parte do token <option1>
 	jal apin # Transformo esse token em inteiro
@@ -380,6 +383,7 @@ mmio_dividir_token:
 	cmd_mesa_ad_item: # 2 argumentos <option1>-<option2>
 
 	move $a0, $s1 # Passo como argumento o resto, ou seja, os argumentos da funcao # Checar linha 213 para entender pq uso $s1 aqui
+	beq $a0, $zero, cmd_invalido # Se nao houver argumentos, comando eh invalido, logo, termina a funcao
 	jal mmio_dividir_token # Vai dividir os argumentos da funcao
 	move $a0, $v0 # Passo como argumento em $a0 a primeira parte do token <option1>
 	jal apin # Transformo esse token em inteiro
@@ -399,6 +403,7 @@ mmio_dividir_token:
 	cmd_mesa_rm_item: # 2 argumentos <option1>-<option2>
 
 	move $a0, $s1 # Passo como argumento o resto, ou seja, os argumentos da funcao # Checar linha 213 para entender pq uso $s1 aqui
+	beq $a0, $zero, cmd_invalido # Se nao houver argumentos, comando eh invalido, logo, termina a funcao
 	jal mmio_dividir_token # Vai dividir os argumentos da funcao
 	move $a0, $v0 # Passo como argumento em $a0 a primeira parte do token <option1>
 	jal apin # Transformo esse token em inteiro
@@ -423,6 +428,7 @@ mmio_dividir_token:
 	cmd_mesa_parcial: # 1 argumento <option1>
 
 	move $a0, $s1 # Passo como argumento o resto, ou seja, os argumentos da funcao # Checar linha 213 para entender pq uso $s1 aqui
+	beq $a0, $zero, cmd_invalido # Se nao houver argumentos, comando eh invalido, logo, termina a funcao
 	jal apin # Transformo esse token em inteiro
 	move $t0, $v0 # Escreve em $t0 o argumento
 
@@ -435,6 +441,7 @@ mmio_dividir_token:
 	cmd_mesa_pagar: # 2 argumentos <option1>-<option2> 
 
 	move $a0, $s1 # Passo como argumento o resto, ou seja, os argumentos da funcao # Checar linha 213 para entender pq uso $s1 aqui
+	beq $a0, $zero, cmd_invalido # Se nao houver argumentos, comando eh invalido, logo, termina a funcao
 	jal mmio_dividir_token # Vai dividir os argumentos da funcao
 	move $a0, $v0 # Passo como argumento em $a0 a primeira parte do token <option1>
 	jal apin # Transformo esse token em inteiro
@@ -454,6 +461,7 @@ mmio_dividir_token:
 	cmd_mesa_fechar: # 1 argumento <option1>
 
 	move $a0, $s1 # Passo como argumento o resto, ou seja, os argumentos da funcao # Checar linha 213 para entender pq uso $s1 aqui
+	beq $a0, $zero, cmd_invalido # Se nao houver argumentos, comando eh invalido, logo, termina a funcao
 	jal apin # Transformo esse token em inteiro
 	move $t0, $v0 # Escreve em $t0 o argumento
 
