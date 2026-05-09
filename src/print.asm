@@ -1,3 +1,6 @@
+# Matheus Aroxa, Davyusow Farias, Lucas Carvalho, 1va 2026.1
+# Descricao: rotinas de impressao (string e inteiro).
+
 .data
         pula_linha:     .asciiz "\n"
 

@@ -1,3 +1,6 @@
+# Matheus Aroxa, Davyusow Farias, Lucas Carvalho, 1va 2026.1
+# Descricao: funcoes da comanda (formatar, adicionar, listar).
+
 .data
     .globl comanda
     comanda: .space 160 #cada item da comanda tem 8 btyes

@@ -1,3 +1,6 @@
+# Matheus Aroxa, Davyusow Farias, Lucas Carvalho, 1va 2026.1
+# Descricao: testes das funcoes de mesas.
+
 .data
 	telefone_teste1: 	.asciiz "81 99090-9090"
 	telefone_teste2: 	.asciiz "81 98080-8080"

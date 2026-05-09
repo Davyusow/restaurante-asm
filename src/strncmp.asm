@@ -1,3 +1,6 @@
+# Matheus Aroxa, Davyusow Farias, Lucas Carvalho, 1va 2026.1
+# Descricao: comparacao dos n primeiros caracteres.
+
 # =========================================================================
 # Função: strncmp
 # Descrição: Compara os n primeiro chars de duas strings

@@ -1,3 +1,6 @@
+# Matheus Aroxa, Davyusow Farias, Lucas Carvalho, 1va 2026.1
+# Descricao: salvar, carregar e formatar dados em backup.
+
 .data
     
     # Caminho do arquivo de backup

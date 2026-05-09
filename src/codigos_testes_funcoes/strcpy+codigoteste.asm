@@ -1,11 +1,14 @@
+# Matheus Aroxa, Davyusow Farias, Lucas Carvalho, 1va 2026.1
+# Descricao: teste isolado do strcpy.
+
 # =========================================================================
-# Função: Strcpy
-# Descrição: Copia uma string — incluindo o caractere NULL (‘\0’) — apontado pela source diretamente para o bloco de memória apontado pelo destination.
+# Funï¿½ï¿½o: Strcpy
+# Descriï¿½ï¿½o: Copia uma string ï¿½ incluindo o caractere NULL (ï¿½\0ï¿½) ï¿½ apontado pela source diretamente para o bloco de memï¿½ria apontado pelo destination.
 # Arqgumentos: 
-#	$a0 - Destination (endereço de memória do destino)
-#	$a1 - Source (endereço de memória da origem)
+#	$a0 - Destination (endereï¿½o de memï¿½ria do destino)
+#	$a1 - Source (endereï¿½o de memï¿½ria da origem)
 # Retorno:
-#	$v0 - (o endereço do destino (destination)
+#	$v0 - (o endereï¿½o do destino (destination)
 # =========================================================================
 .data
 	origem:  .asciiz "Hello World"
@@ -39,7 +42,7 @@
 	li $v0, 10
 	syscall
 	
-	strcopy: #Para utilizar essa função obrigatóriamente deve ser passado como parâmetro nos registradores a0 e a1 o ENDEREÇO, por meio da função "la" (LOAD ADDRESS)
+	strcopy: #Para utilizar essa funï¿½ï¿½o obrigatï¿½riamente deve ser passado como parï¿½metro nos registradores a0 e a1 o ENDEREï¿½O, por meio da funï¿½ï¿½o "la" (LOAD ADDRESS)
 		addu $t0, $zero, $a0 #Armazenando o inicio do array destino em t0
 		addu $t1, $zero, $a1 #Armazenando o inicio do array origem em t1
 	
@@ -53,6 +56,6 @@
 			addi $t1, $t1, 1 #Andando uma letra (indice) do array destino (4 bytes)
 			j while
 		fim:
-		addu $v0, $zero, $a0 #Armazenando o endereço de memória do destino (parâmetro destination) no registrador de retorno da função
-		jr $ra #Volta para o lugar onde a função foi chamada
+		addu $v0, $zero, $a0 #Armazenando o endereï¿½o de memï¿½ria do destino (parï¿½metro destination) no registrador de retorno da funï¿½ï¿½o
+		jr $ra #Volta para o lugar onde a funï¿½ï¿½o foi chamada
 	

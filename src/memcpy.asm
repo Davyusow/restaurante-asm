@@ -1,3 +1,6 @@
+# Matheus Aroxa, Davyusow Farias, Lucas Carvalho, 1va 2026.1
+# Descricao: copia bloco de memoria byte a byte.
+
 # =========================================================================
 # Função: memcpy
 # Descrição: Copia um bloco de memória de 'source' para 'destination'.

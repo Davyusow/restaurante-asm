@@ -1,3 +1,6 @@
+# Matheus Aroxa, Davyusow Farias, Lucas Carvalho, 1va 2026.1
+# Descricao: operacoes de mesas e comanda por mesa.
+
 .data
 	# Constantes
 	.eqv MESA_TAM		224 # O tamanho em bytes de uma mesa na memória + estrutura com comanda

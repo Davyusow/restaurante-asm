@@ -1,3 +1,6 @@
+# Matheus Aroxa, Davyusow Farias, Lucas Carvalho, 1va 2026.1
+# Descricao: concatenacao de strings.
+
 # =========================================================================
 # Função: strcat
 # Descrição: concatena duas strings

@@ -1,3 +1,6 @@
+# Matheus Aroxa, Davyusow Farias, Lucas Carvalho, 1va 2026.1
+# Descricao: testes de utilitarios de string.
+
 .data
 	strA:	.asciiz "carro"
 	strB:	.asciiz "laje"

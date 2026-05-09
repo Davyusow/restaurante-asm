@@ -1,3 +1,6 @@
+# Matheus Aroxa, Davyusow Farias, Lucas Carvalho, 1va 2026.1
+# Descricao: testes de persistencia (salvar, carregar, formatar).
+
 .data
     # Dados para testes de persistência
     telefone_teste:     .asciiz "81 99090-9090"

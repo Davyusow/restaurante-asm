@@ -1,3 +1,6 @@
+# Matheus Aroxa, Davyusow Farias, Lucas Carvalho, 1va 2026.1
+# Descricao: comparacao de strings.
+
 # Compara duas strings
 # Retorna positivo caso seja uma letra maior
 # Retorna 0 se for igual
