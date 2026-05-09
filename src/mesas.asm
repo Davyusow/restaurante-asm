@@ -66,18 +66,18 @@ iniciar_mesa:
 	sw 		$a1, 8($sp)		# Salva o telefone
 	sw 		$a2, 4($sp)   	# Salva o nome
 
-	li 		$t0, 1
-	li 		$t1, 15
+	li 		$t0, 1 #limite inferior do id
+	li 		$t1, 15 #limite superior do id
 	
 	blt 	$a0, $t0, mesa_inexistente	# se id < 1, mesa inexistente
 	bgt 	$a0, $t1, mesa_inexistente	# se id > 15, mesa inexistente
-	addi 	$a0, $a0, -1
+	addi 	$a0, $a0, -1 #converte id para indice
 
 	jal  	buscar_mesa_id 	# Busca o índice correto
 	move 	$t2, $v0 		# Endereço da mesa
 	lb 		$t3, OFFSET_OCUPADA($t2)	# $t3 é o status de ocupada
 
-	bne 	$t3, $0, mesa_ja_ocupada
+	bne 	$t3, $0, mesa_ja_ocupada #se ja estiver ocupada
 
 	# Chama o set_telefone
 	move 	$a0, $a0		# Mantém o id
@@ -144,15 +144,15 @@ buscar_mesa_id:
 set_is_ocupada:
 	get_mesa 	$a1
 
-	beq  $a1, $zero, set_livre
+	beq  $a1, $zero, set_livre #se a1 for zero, libera
 	
 	set_ocupada:
-    li   $t1, 1
-    sb   $t1, OFFSET_OCUPADA($v0)
+	li   $t1, 1 #marca como ocupada
+	sb   $t1, OFFSET_OCUPADA($v0) #grava status
     jr   $ra
 
 	set_livre:
-	sb   $zero, OFFSET_OCUPADA($v0)
+	sb   $zero, OFFSET_OCUPADA($v0) #marca como livre
 	jr   $ra
 
 # Assumindo que $s0 tem o endereço do array das mesas, e $a0 o índice buscado
@@ -161,11 +161,11 @@ set_telefone:
 	get_mesa $a1
 
 	addi 	$a0, $v0, OFFSET_TELEFONE 	# $a0 é o ponterio para o destino
-	addiu 	$sp, $sp, -4
-	sw 		$ra, 0($sp)
+	addiu 	$sp, $sp, -4 #reserva pilha
+	sw 		$ra, 0($sp) #salva retorno
 	jal 	strcpy
-	lw 		$ra, 0($sp)
-	addiu 	$sp, $sp, 4
+	lw 		$ra, 0($sp) #restaura retorno
+	addiu 	$sp, $sp, 4 #libera pilha
 	jr 		$ra
 
 # Assumindo que $s0 tem o endereço do array das mesas, e $a0 o índice buscado
@@ -174,11 +174,11 @@ set_nome_responsavel:
 	get_mesa $a1
 
 	addi 	$a0, $v0, OFFSET_RESPONSAVEL #
-	addiu 	$sp, $sp, -4
-	sw 		$ra, 0($sp)
+	addiu 	$sp, $sp, -4 #reserva pilha
+	sw 		$ra, 0($sp) #salva retorno
 	jal 	strcpy
-	lw 		$ra, 0($sp)
-	addiu 	$sp, $sp, 4
+	lw 		$ra, 0($sp) #restaura retorno
+	addiu 	$sp, $sp, 4 #libera pilha
 	jr 		$ra
 
 # Assumindo que $s0 tem o endereço do array das mesas, e $a0 o índice
@@ -391,7 +391,7 @@ busca_item_rm:
 rm_item_decrementou:
 	lw 		$t6, 4($t4)  # Quantidade
 	addi 	$t6, $t6, -1
-	bne 	$t6, $zero, rm_item_decrementou
+	bne 	$t6, $zero, rm_item_decrementou #se ainda tem quantidade, continua aqui
 	
 	# Se quantidade chegou a 0, remover o item
 	sw 		$zero, 0($t4)

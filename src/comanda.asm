@@ -23,9 +23,9 @@
         jr $ra
     .globl adicionar_item_comanda
     adicionar_item_comanda:
-        li $t0, 1
+        li $t0, 1 #limite inferior do item
         blt $a0, $t0, erro_invalido #verifica se o item é menor que 1
-        li $t0, 20
+        li $t0, 20 #limite superior do item
         bgt $a0, $t0, erro_invalido #verifica se o item é maior que 20
 
         addi $t1, $a0, -1 #calcula a posição do array pra inserir o item
@@ -40,13 +40,13 @@
 
         addi $t1, $a0, -1 #calcula a posição do array pra inserir o item
 
-        li $t2, 8 
+        li $t2, 8 #tamanho do item na comanda
         mul $t1, $t1, $t2 # calcula o offset do array (tamanho do item)
 
         la $t0, comanda
         add $t3, $t0, $t1 #posicao da comanda com offset
 
-        lw $t4, 0($t3)
+        lw $t4, 0($t3) #le o id atual na comanda
         bnez $t4, item_ja_existe_na_comanda #verifica se o item ja existe na comanda
 
         sw $a0, 0($t3) #persiste o id do item

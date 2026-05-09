@@ -26,50 +26,50 @@
         jr $ra
     .globl adicionar_item_cardapio
     adicionar_item_cardapio:
-        li $t0, 1
+        li $t0, 1 #limite inferior do id
         blt $a0, $t0, erro_invalido #verifica se a posição é menor que 1
-        li $t0, 20
+        li $t0, 20 #limite superior do id
         bgt $a0, $t0, erro_invalido #verifica se a posição é maior que 20
 
         addi $t1, $a0, -1 #calcula a posição do array pra inserir o item
 
-        li $t2, 40 
+        li $t2, 40 #tamanho do item em bytes
         mul $t1, $t1, $t2 # calcula o offset do array (tamanho do item)
 
         la $t0, cardapio
         add $t3, $t0, $t1 #posicao do cardapio com offset
 
-        lw $t4, 0($t3)
+        lw $t4, 0($t3) #le o id atual da posicao
         bnez $t4, erro_ocupado #verifica se os primeiros bytes são 0
 
         sw $a0, 0($t3) #persiste o id do item
         sw $a1, 4($t3) #persiste o preco do item
 
-        addi $sp, $sp, -4
+        addi $sp, $sp, -4 #reserva espaco na pilha
         sw $ra, 0($sp) #salva o ra para voltar posteriomente
         
         addi $a0, $t3, 8      #endereco de destino da string a ser copiada
         move $a1, $a2         #move a descricao para $a1 (requisito de strcopy)
         jal strcpy            #persiste descricao no cardapio  
 
-        lw $ra, 0($sp)
-        addi $sp, $sp, 4
+        lw $ra, 0($sp) #restaura o ra
+        addi $sp, $sp, 4 #libera a pilha
         jr $ra #retorna para o programa principal
     .globl remover_item_cardapio
     remover_item_cardapio:
-        li $t0, 1
+        li $t0, 1 #limite inferior do id
         blt $a0, $t0, erro_invalido # verifica se a posição é menor que 1
-        li $t0, 20
+        li $t0, 20 #limite superior do id
         bgt $a0, $t0, erro_invalido # verifica se a posição é maior que 20
 
         addi $t1, $a0, -1 # calcula o índice do array 
-        li $t2, 40 
+        li $t2, 40 #tamanho do item em bytes
         mul $t1, $t1, $t2 #calcula o offset
 
         la $t0, cardapio
         add $t3, $t0, $t1 #endereco no cardapio com offset
 
-        lw $t4, 0($t3)
+        lw $t4, 0($t3) #le o id atual da posicao
         beq $t4, $zero, erro_vazio #verifica se existe um item na posicao
 
         sw $zero, 0($t3) # apaga o id
@@ -103,7 +103,7 @@
     loop_listar:
         beq $t1, $t2, fim_listar #verifica se deve continuar
 
-        lw $t3, 0($t0)
+        lw $t3, 0($t0)          # carrega o id do item
         beq $t3, $zero, proximo_item #se comecar com zero entao a posicao está vázio e nao há nada a imprimir
 
         #label id

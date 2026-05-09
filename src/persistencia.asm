@@ -40,8 +40,8 @@ salvar_persistencia:
     li $v0, 13                 # open file syscall
     syscall
     
-    move $s0, $v0              # $s0 = file descriptor
-    bgez $s0, arquivo_aberto
+    move $s0, $v0              # guarda o file descriptor
+    bgez $s0, arquivo_aberto   # se abriu ok
     
     # Erro ao abrir arquivo
     la $a0, msg_erro_arquivo
@@ -59,7 +59,7 @@ arquivo_aberto:
     li $v0, 15                 # write file syscall
     syscall
     
-    bgez $v0, cardapio_salvo
+    bgez $v0, cardapio_salvo   # escrita ok
     
     # Erro ao salvar cardapio
     la $a0, msg_erro_arquivo
@@ -76,7 +76,7 @@ cardapio_salvo:
     li $v0, 15                 # write file syscall
     syscall
     
-    bgez $v0, mesas_salvas
+    bgez $v0, mesas_salvas     # escrita ok
     
     # Erro ao salvar mesas
     la $a0, msg_erro_arquivo
@@ -129,8 +129,8 @@ carregar_persistencia:
     li $v0, 13                 # open file syscall
     syscall
     
-    move $s0, $v0              # $s0 = file descriptor
-    bgez $s0, arquivo_leitura_ok
+    move $s0, $v0              # guarda o file descriptor
+    bgez $s0, arquivo_leitura_ok # se abriu ok
     
     # Arquivo não encontrado - usar dados vazios
     la $a0, msg_nao_encontrado
@@ -160,7 +160,7 @@ arquivo_leitura_ok:
     li $v0, 14                 # read file syscall
     syscall
     
-    blez $v0, fechar_arquivo_leitura
+    blez $v0, fechar_arquivo_leitura # se falhou, encerra
     
 carregar_sucesso:
     # Mensagem de sucesso
@@ -205,7 +205,7 @@ formatar_persistencia:
 
 loop_formatar_cardapio:
     beq $t1, $t2, formatar_mesas_inicio
-    sb $zero, 0($t0)
+    sb $zero, 0($t0) #zera byte
     addi $t0, $t0, 1
     addi $t1, $t1, 1
     j loop_formatar_cardapio
@@ -218,7 +218,7 @@ formatar_mesas_inicio:
 
 loop_formatar_mesas:
     beq $t1, $t2, formatar_fim
-    sb $zero, 0($t0)
+    sb $zero, 0($t0) #zera byte
     addi $t0, $t0, 1
     addi $t1, $t1, 1
     j loop_formatar_mesas
